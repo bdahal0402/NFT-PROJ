@@ -1,11 +1,26 @@
 {
-  "name": "react-ui",
+  "name": "nft_frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "^2.1.8"
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "axios": "^0.21.1",
+    "dotenv": "^8.2.0",
+    "ethers": "^5.1.0",
+    "ipfs-api": "^26.1.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-fullscreen-loading": "0.0.4",
+    "react-modal": "^3.12.1",
+    "react-multi-carousel": "^2.6.2",
+    "react-qr-code": "^1.1.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "sweetalert": "^2.1.2",
+    "web-vitals": "^1.0.1",
+    "web3": "^1.3.4"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -14,13 +29,21 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "proxy": "http://localhost:5000"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
