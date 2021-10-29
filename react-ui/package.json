@@ -1,6 +1,7 @@
 {
   "name": "nft_frontend",
   "version": "0.1.0",
+  "proxy": "http://localhost:5000",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -11,6 +12,7 @@
     "ethers": "^5.1.0",
     "ipfs-api": "^26.1.2",
     "react": "^17.0.2",
+    "react-bootstrap": "^2.0.1",
     "react-dom": "^17.0.2",
     "react-fullscreen-loading": "0.0.4",
     "react-modal": "^3.12.1",

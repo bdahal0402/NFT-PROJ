@@ -14,6 +14,7 @@ class Signin extends React.Component {
             email: "",
             password: "",
             hidden: true,
+            token: ""
         }
     }
 
@@ -34,25 +35,38 @@ class Signin extends React.Component {
         } else if (this.state.password === "" || this.state.password === null) {
             return swal({ title: "Enter your password", icon: "error" })
         } else {
-            // console.log("email&password", this.state.email, this.state.password)
-            axios.post(api.API_URL + 'login', {
+            let userToken;
+            let fullName;
+            axios.post('/users/login', {
                 "email": this.state.email,
-                "password": this.state.password
-            }).then((respdata) => {
-                console.log("respdata============>login", respdata.data.data)
-                if (respdata.data.status === true) {
-                    sessionStorage.setItem("token", respdata.data.data.token);
-                    localStorage.setItem('currentUserEmail',respdata.data.data.email)
-                    
-                    this.props.history.push('/')
-                } else {
-                    console.log("elsecase========")
-                    swal({ title: respdata.data.message, icon: "error" })
-                    this.props.history.push("/Signin");
+                "password": this.state.password,
+            }).then((response) => {
+                if (response.status === 200) {
+                    userToken = response.data.token;
+                    fullName = response.data.fullName;
+
+                    this.setState({ token: userToken });
+                    localStorage.setItem('token', userToken);
+                    localStorage.setItem('fullName', fullName);
+                    localStorage.setItem('userEmail', this.state.email);
+                    swal({ title: "Logged in successfully!", icon: "success" });
+                    setTimeout(function () {
+                        window.location.href = './';
+                    }, 2000);
                 }
-            }).catch((errors) => {
-                // console.log("errors", errors)
-            })
+            }, error => {
+                console.log(error);
+                if (error.response.data === "unverified") {
+                    localStorage.setItem('verificationEmail', this.state.email);
+                    swal({ title: "Your email is not verified yet!", icon: "warning" })
+                    setTimeout(function () {
+                        window.location.href = './VerifyEmail';
+                    }, 2000);
+                }
+                else {
+                    return swal({ title: error.response.data, icon: "error" })
+                }
+            });
         }
     }
 

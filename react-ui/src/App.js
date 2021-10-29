@@ -9,6 +9,7 @@ import Signup from './Components/Signup'
 import Signin from './Components/Signin'
 import Createassets from './Components/Createasset'
 import Howto from './Components/howto'
+import VerifyEmail from './Components/VerifyEmail'
 
 
 
@@ -26,6 +27,7 @@ function App() {
         <Route exact path="/Signin" component={Signin} />
         <Route exact path="/Createassets" component={Createassets} />
         <Route exact path="/howto" component={Howto} />
+        <Route exact path="/VerifyEmail" component={VerifyEmail} />
       </Switch>
     </div>
   );

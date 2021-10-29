@@ -1,42 +1,35 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const cluster = require('cluster');
-const numCPUs = require('os').cpus().length;
+const cors = require('cors');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const userRouter = require('../routes/users');
+//const postRouter = require('./routes/posts');
+const connection = mongoose.connection;
+const app = express();
 
-const isDev = process.env.NODE_ENV !== 'production';
-const PORT = process.env.PORT || 5000;
+const uri = "mongodb+srv://" + process.env.ATLAS_USER + ":" + process.env.ATLAS_PASSWD + "@" + process.env.ATLAS_URI;
 
-// Multi-process to utilize all CPU cores.
-if (!isDev && cluster.isMaster) {
-  console.error(`Node cluster master ${process.pid} is running`);
+// Priority serve any static files.
+app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
 
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+// All remaining requests return the React app, so it can handle routing.
+app.get('*', function (request, response) {
+  response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
+});
 
-  cluster.on('exit', (worker, code, signal) => {
-    console.error(`Node cluster worker ${worker.process.pid} exited: code ${code}, signal ${signal}`);
-  });
+app.use(cors());
+app.use(express.json());
+app.use("/users", userRouter);
+app.use(bodyParser.json());
 
-} else {
-  const app = express();
+mongoose.connect(uri, { useNewUrlParser: true });
+connection.once('open', () => {
+  console.log("Database connection established successfully!");
+});
 
-  // Priority serve any static files.
-  app.use(express.static(path.resolve(__dirname, '../react-ui/build')));
+const port = process.env.PORT || 5000;
+app.listen(port);
+console.log(`Listening on port ${port}`);
 
-  // Answer API requests.
-  app.get('/api', function (req, res) {
-    res.set('Content-Type', 'application/json');
-    res.send('{"message":"Hello from the custom server!"}');
-  });
-
-  // All remaining requests return the React app, so it can handle routing.
-  app.get('*', function(request, response) {
-    response.sendFile(path.resolve(__dirname, '../react-ui/build', 'index.html'));
-  });
-
-  app.listen(PORT, function () {
-    console.error(`Node ${isDev ? 'dev server' : 'cluster worker '+process.pid}: listening on port ${PORT}`);
-  });
-}

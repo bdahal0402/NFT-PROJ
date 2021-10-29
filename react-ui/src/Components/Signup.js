@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import api from '../api'
 import swal from 'sweetalert';
 
 
@@ -39,7 +38,6 @@ class Signup extends React.Component {
     }
 
 
-
     signup = () => {
         if (this.state.username === "" || this.state.username === null) {
             return swal({ title: 'Enter your username', icon: "error" })
@@ -52,25 +50,22 @@ class Signup extends React.Component {
         } else if (this.state.confirmPass !== this.state.password) {
             swal({ title: "Password and confirm Password don't match", icon: "error" })
         } else {
-            // console.log('signupmethod_data', this.state.username, this.state.email, this.state.password, this.state.confirmPass)
-            axios.post(api.API_URL + 'register', {
-                "userName": this.state.username,
+            axios.post('/users/add', {
+                "username": this.state.username,
                 "email": this.state.email,
                 "password": this.state.password,
-                "confirmPass": this.state.confirmPass
-            }).then((respdata) => {
-                console.log("respdata", respdata.data)
-                if (respdata.data.status === true) {
-                    swal({ title: "Registered successfull.", icon: "success" }).then((resp) => {
-                        this.props.history.push('/Signin')
-                    })
-
-                } else {
-                    swal({ title: "This email is already taken,try with another one", icon: "error" })
+                "confirm_password": this.state.confirmPass
+            }).then((response) => {
+                console.log(response);
+                if (response.status === 200) {
+                    swal({ title: 'Signed up successfully!\nConfirmation email sent!', icon: "success" });
+                    setTimeout(function () {
+                        window.location.href = './Signin';
+                    }, 2000);
                 }
-            }).catch((errs) => {
-                // console.log('signup_catchlock=====', errs)
-            })
+            }, error => {
+                swal({ title: error.response.data, icon: "error" });
+            });
         }
     }
 

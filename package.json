@@ -14,16 +14,20 @@
     "react-ui/node_modules"
   ],
   "dependencies": {
-    "express": "^4.16.4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mars/heroku-cra-node.git"
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "randomstring": "^1.2.1",
+    "sha256": "^0.2.0",
+    "sib-api-v3-sdk": "^8.2.1"
   },
   "keywords": [
     "node",
     "heroku",
-    "create-react-app",
     "react"
   ],
   "license": "MIT",
