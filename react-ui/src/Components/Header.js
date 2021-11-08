@@ -4,7 +4,49 @@ import swal from 'sweetalert';
 import Logo from '../images/nlogo.jpg';
 // import Howto from './howto';
 
+import Web3 from "web3";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
+let provider = null;
+let web3 = null;
+let accounts = null;
+
+
+const providerOptions = {
+    walletconnect: {
+        package: WalletConnectProvider, // required
+        options: {
+            infuraId: "e126b9c0a29a41da860bf6527a3cdf88" // required
+        }
+    }
+};
 var jwttoken;
+
+async function showWalletConnect() {
+    if (!provider) {
+        const web3Modal = new Web3Modal({
+            cacheProvider: true, // optional
+            providerOptions // required
+        });
+        provider = await web3Modal.connect();
+        web3 = new Web3(provider);
+    }
+
+    // Subscribe to provider disconnection
+    provider.on("disconnect", () => {
+        swal({ title: "Wallet connection closed", icon: "error" });
+        document.getElementById('connectedAccount').style = "border:0;";
+        document.getElementById('connectedAccount').value = "";
+    });
+
+    if (!accounts) {
+        accounts = await web3.eth.getAccounts();
+        swal({ title: "Connected to wallet!", icon: "success" })
+        document.getElementById('connectedAccount').value = "CONNECTED: " + accounts[0].toLowerCase();
+        document.getElementById('connectedAccount').style = "border:0;";
+    }
+}
 
 function Header() {
     jwttoken = sessionStorage.getItem("token")
@@ -27,13 +69,14 @@ function Header() {
     }
 
 
+
     return (
         <div className="topheader">
             <nav className="navbar navbar-expand-lg nav-custom-style fixed-top">
                 <div className="container">
                     <div className="d-flex justify-content-end justify-content-lg-start pt-1 pt-lg-0">
                         <a className="navbar-brand" href="/">
-                        <img src={Logo} alt="logo"/>
+                            <img src={Logo} alt="logo" />
                         </a>
                     </div>
                     <div class="p-1 bg-light rounded rounded-pill shadow-sm search-box">
@@ -49,7 +92,7 @@ function Header() {
                             <a class="nav-link" href="/" >Explore</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/howto"  target="_blank">How it works</a>
+                            <a class="nav-link" href="/howto" target="_blank">How it works</a>
                         </li>
 
                     </ul>
@@ -61,8 +104,8 @@ function Header() {
                             </div>
                         ) : (
                             <div>
-                                <button className="btn blue-btn" onClick={login}>Login</button>
-                                <button style={{ marginLeft: 20 }} className="btn border-btn" onClick={generateasset}>Generate asset</button>
+                                <button className="btn blue-btn" onClick={showWalletConnect}>Connect Wallet</button>
+                                <input id="connectedAccount" style={{ border: 0, visibility: 'hidden', width: '150px' }} disabled />
                             </div>
                         )}
                     </div>

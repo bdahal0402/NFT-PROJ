@@ -13,9 +13,6 @@ import VerifyEmail from './Components/VerifyEmail'
 
 
 
-
-
-
 function App() {
 
   return (
