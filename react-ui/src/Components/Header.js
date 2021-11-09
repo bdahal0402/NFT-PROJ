@@ -2,32 +2,48 @@ import React from 'react';
 import { useHistory } from "react-router-dom";
 import swal from 'sweetalert';
 import Logo from '../images/nlogo.jpg';
-// import Howto from './howto';
 
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 let provider = null;
 let web3 = null;
 let accounts = null;
+let walletId = null;
 
 
 const providerOptions = {
     walletconnect: {
-        package: WalletConnectProvider, // required
+        package: WalletConnectProvider,
         options: {
-            infuraId: "e126b9c0a29a41da860bf6527a3cdf88" // required
+            infuraId: "e126b9c0a29a41da860bf6527a3cdf88"
         }
     }
 };
-var jwttoken;
+
+async function disconnectWallet(remoteDisconnect) {
+    walletId = null;
+    provider = null;
+    if (remoteDisconnect) {
+        toast("Wallet was disconnected remotely, try connecting again.", { theme: 'light', hideProgressBar: 'true', type: 'error' });
+    }
+    else {
+        toast("Wallet disconnected!", { theme: 'light', hideProgressBar: 'true', type: 'info' });
+    }
+    sessionStorage.clear()
+    setTimeout(function () {
+        window.location.reload()
+    }, 1000);
+}
 
 async function showWalletConnect() {
     if (!provider) {
         const web3Modal = new Web3Modal({
-            cacheProvider: true, // optional
-            providerOptions // required
+            cacheProvider: false,
+            providerOptions
         });
         provider = await web3Modal.connect();
         web3 = new Web3(provider);
@@ -35,40 +51,24 @@ async function showWalletConnect() {
 
     // Subscribe to provider disconnection
     provider.on("disconnect", () => {
-        swal({ title: "Wallet connection closed", icon: "error" });
-        document.getElementById('connectedAccount').style = "border:0;";
-        document.getElementById('connectedAccount').value = "";
+        disconnectWallet(true);
     });
 
-    if (!accounts) {
+    if (walletId == null) {
         accounts = await web3.eth.getAccounts();
-        swal({ title: "Connected to wallet!", icon: "success" })
-        document.getElementById('connectedAccount').value = "CONNECTED: " + accounts[0].toLowerCase();
-        document.getElementById('connectedAccount').style = "border:0;";
+        walletId = accounts[0].toLowerCase();
+        toast("Wallet connected!", { theme: 'light', hideProgressBar: 'true', type: 'success' });
+        sessionStorage.setItem("walletId", walletId);
+        setTimeout(function () {
+            window.location.reload()
+        }, 1000);
     }
 }
 
 function Header() {
-    jwttoken = sessionStorage.getItem("token")
-    // console.log("inside header==========", jwttoken);
+    walletId = sessionStorage.getItem("walletId");
+
     const history = useHistory();
-    const login = () => {
-        history.push("/Signin");
-    }
-    const logout = () => {
-        sessionStorage.clear()
-        window.location.reload()
-    }
-    const generateasset = () => {
-        // console.log("towen header", jwttoken);
-        if (jwttoken) {
-            history.push("/Createassets")
-        } else {
-            return swal({ title: "Please login!", icon: "error" })
-        }
-    }
-
-
 
     return (
         <div className="topheader">
@@ -88,29 +88,24 @@ function Header() {
                         </div>
                     </div>
                     <ul class="nav header-menu">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/" >Explore</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/howto" target="_blank">How it works</a>
+
+                        <li>
+                            {walletId != null ? (
+                                <div>
+                                    <input id="connectedAccount" style={{ border: 0, width: '200%' }} value={walletId} disabled />
+                                    <br /><button className="btn blue-btn" onClick={() => { disconnectWallet(false) }}>Logout</button>
+                                </div>
+                            ) : (
+                                <div>
+                                    <button className="btn blue-btn" onClick={showWalletConnect}>Connect Wallet</button>
+                                </div>
+                            )}
                         </li>
 
                     </ul>
-                    <div className="collapse navbar-collapse justify-content-end navMenu">
-                        {jwttoken != null ? (
-                            <div>
-                                <button className="btn blue-btn" onClick={logout}>Logout</button>
-                                <button style={{ marginLeft: 20 }} className="btn border-btn" onClick={generateasset}>Generate asset</button>
-                            </div>
-                        ) : (
-                            <div>
-                                <button className="btn blue-btn" onClick={showWalletConnect}>Connect Wallet</button>
-                                <input id="connectedAccount" style={{ border: 0, visibility: 'hidden', width: '150px' }} disabled />
-                            </div>
-                        )}
-                    </div>
                 </div>
             </nav>
+            <ToastContainer />
         </div>
     );
 }
