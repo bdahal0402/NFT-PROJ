@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { Route, Switch } from 'react-router-dom';
+import background from './images/home_background.png';
 
 
 import Home from './Components/Home'
@@ -11,7 +12,7 @@ import Home from './Components/Home'
 function App() {
 
   return (
-    <div className="App">
+    <div className="App" style={{ backgroundImage: `url(${background})` }}>
       <Switch>
         <Route exact path="/" component={Home} />
         {/*<Route exact path="/Detail" component={Detail} />
