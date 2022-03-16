@@ -1,5 +1,9 @@
 # An incomplete NFT web project.
 
+
+# Current end state:
+https://kc-nft.herokuapp.com/
+
 ## Design Points
 
 A combo of two npm projects, the backend server and the frontend UI. So there are two `package.json` configs and thereforce [two places to run `npm` commands](#user-content-local-development):
